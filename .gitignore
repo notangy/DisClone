@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+training.jsonl
+.DS_Store
+
 # C extensions
 *.so
 
