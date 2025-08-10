@@ -1,0 +1,9 @@
+bs4
+transformers==4.55.0
+datasets==4.0.0
+numpy==1.26.4
+accelerate>=0.28.0 
+flask
+torch
+torchvision
+numpy
