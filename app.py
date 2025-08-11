@@ -5,7 +5,7 @@ import torch
 
 app = Flask(__name__)
 
-checkpoint_path = os.path.abspath("./checkpoint-8500") # change this to current model folder for testing
+checkpoint_path = os.path.abspath("./trained-model") # change this to current model folder for testing
 
 # Load your fine-tuned model and tokenizer once when the app starts
 tokenizer = AutoTokenizer.from_pretrained(checkpoint_path, local_files_only=True)
@@ -17,6 +17,7 @@ model.eval()  # set model to evaluation mode
 @app.route("/", methods=["GET", "POST"])
 def home():
     generated_text = ""
+    prompt = ""
     if request.method == "POST":
         prompt = request.form["prompt"]
         formatted_input = f"Prompt: {prompt}\nResponse:"

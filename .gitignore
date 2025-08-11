@@ -8,6 +8,8 @@ training.jsonl
 .python-version
 .DS_Store
 /Discord_Export
+/trained-model
+/checkpoint-*
 
 # C extensions
 *.so
