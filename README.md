@@ -9,12 +9,18 @@ Well, you can't. But you can do the next best thing; introduce a custom Discord 
 # How does it work?
 
 Make sure you install all the necessary requirements in `requirements.txt` and have python installed on your machine (below version 3.12, pytorch is very picky about the version you have!)
+
+
 Once that's sorted you'll need .html exports from your most active server channels and private messages (certain tools already exist for these purposes...). Once you have these, run `chatlog_cleaner.py` with your discord username:
 
 e.g. python3 chatlog_cleaner.py --username notangy
 
 This will produce a `training.jsonl` file, which will contain your own messages paired up to prompts from other users. Due to the way the training data is structured, this works best for data pulled from DMs or small servers.
 
-Now here comes the interesting part... 
+Once you have your .jsonl file, you're ready to train!
 
-TODO put finetune.py instructions once script is trained and working
+Use the `finetune.py` script, which will read your training data and produce a fine-tuned model from gpt-2.
+
+**Note**: Depending on the size of your training data, the fitting process may take a very long time with high resource usage. For reference, my data contained over 20000 key/value pairs and took two hours to train with an CUDA enabled RTX 4080. I only recommend using CPU with torch if your data set is very small (<1000)
+
+TODO write instructions for setting up discord bot with final trained model
