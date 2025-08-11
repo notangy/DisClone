@@ -1,3 +1,6 @@
+# 🚨 THIS IS AN EXPERIMENTAL WORK IN PROGRESS 🚨
+I don't mind people looking at or borrowing my work but I give no guarantee that the provided files will work out of the box. This is purely for my own learning until I verify that the training outputs work as intended.
+
 # (Dis)clone yourself!
 
 Wouldn't it be great if you could be online all the time, able to entertain your friends whenever they needed you?
