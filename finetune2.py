@@ -11,7 +11,7 @@ def tokenize_function(examples):
 
 
 def load_dataset(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf8") as file:
         lines = file.readlines()
     
     data = [json.loads(line) for line in lines]
