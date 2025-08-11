@@ -1,5 +1,5 @@
-# 🚨 THIS IS AN EXPERIMENTAL WORK IN PROGRESS 🚨
-I don't mind people looking at or borrowing my work but I give no guarantee that the provided files will work out of the box. This is purely for my own learning until I verify that the training outputs work as intended.
+**DISCLAIMER**
+As this is a pet project for the purpose of learning and AI tools can rapidly change, I give no guarantee that the provided files will work out of the box. Feel free to play around with them however you wish!
 
 # (Dis)clone yourself!
 
@@ -43,4 +43,10 @@ With your trained model ready, you can test it in the flask app `app.py`. It has
 The last step will mostly be coming from https://discordpy.readthedocs.io/en/stable/ (assuming your bot code will be written in python).
 
 There's many different use cases for a Discord bot, but for now we'll just have ours respond with generated text whenever someone in a server directly mentions it. 
-You'll need to have a bot set up already on the Discord developer portal, and a token for it.
+You'll need to have a bot set up already on the Discord developer portal, and a token for it. Place the token into a .env file as token={token_here}, and run `disclone.py` when your bot has been added to the Discord client.
+
+# That's it!
+
+Your bot will respond with text generated from the trained model whenever it detects a message mentioning it! You can expand the script to do more actions, this is just the bare minimum. Note that you will need to have the script running on a server or remote machine in order for the bot to stay live, but that's outside the scope of this project.
+
+Overall, this took three days of trial-and-error, reinstalling venvs, and praying that my RTX didn't explode. It was fun!

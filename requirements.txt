@@ -9,3 +9,4 @@ torch
 torchvision
 numpy
 discord.py
+dotenv

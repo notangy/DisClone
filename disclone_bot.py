@@ -40,7 +40,7 @@ class DisCloneClient(discord.Client):
             # Generate output (tweak parameters for creativity or length)
             outputs = model.generate(
                 inputs, 
-                max_new_tokens=60,
+                max_new_tokens=30,
                 do_sample=True, 
                 top_p=0.95, 
                 top_k=90,
