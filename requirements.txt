@@ -8,3 +8,4 @@ flask
 torch
 torchvision
 numpy
+discord.py

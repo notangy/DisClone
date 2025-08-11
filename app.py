@@ -14,6 +14,10 @@ tokenizer.pad_token = tokenizer.eos_token
 model = GPT2LMHeadModel.from_pretrained(checkpoint_path, local_files_only=True)
 model.eval()  # set model to evaluation mode
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     generated_text = ""
@@ -23,8 +27,7 @@ def home():
         formatted_input = f"Prompt: {prompt}\nResponse:"
         inputs = tokenizer.encode(formatted_input, return_tensors="pt")
 
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model.to(device)
+
         inputs = inputs.to(device)
         
         # Generate output (tweak parameters for creativity or length)
