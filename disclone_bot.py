@@ -2,6 +2,11 @@ import discord
 import os
 from transformers import GPT2LMHeadModel, AutoTokenizer
 import torch
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv('token') # put your bot token in a .env file
 
 
 checkpoint_path = os.path.abspath("./trained-model") 
@@ -52,4 +57,4 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 client = DisCloneClient(intents=intents)
-client.run('bot token goes here')
+client.run(BOT_TOKEN)
