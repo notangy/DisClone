@@ -9,8 +9,11 @@ import os
 # Key = previous messages in DM or server ('prompt' data)
 # Value = response, AKA our own messages
 
-root_folder = './Discord_Export'
-output_file = 'training.jsonl'
+# This will contain our Discord logs
+root_folder = './Test'
+
+# Name of the training file that will be produced
+output_file = 'training2.jsonl'
 
 full_training_data = []
 
@@ -24,45 +27,63 @@ def search_through_logs(soup, discord_username):
     add_to_data = False
     is_own_msg = False
     prev_own_msg = False
-    
 
     # Messages will only be in <span> elements with the class 'chatlog__markdown-preserve'
     # But we want to ignore any messages that aren't from us
     # Solution: extract spans that are children of the span with title={DISCORD_USERNAME} 
 
-    for div in soup.find_all('div', class_='chatlog__message-group'):
-        
-        # Extract text from the span that contains the actual message content
-        msg = div.find('span', class_='chatlog__markdown-preserve')
-        is_own_msg = div.find('span', title=discord_username)
+    i = 0
 
-        if msg:
+    for div in soup.find_all('div', class_='chatlog__message-group'):
+
+
+        # Each message group can contain several message containers
+        containers = div.find_all('div', class_='chatlog__message-container')
+        is_own_msg = div.find('span', title=discord_username)
+       
+        for c in containers:
+
+            print(c)
+
+           # Skip any container that contains an attachment or embed
+            if c.find('div', class_='chatlog__attachment') or c.find('div', class_='chatlog__embed'):
+                continue
+
+            # Get the message text
+            msg = c.find('span', class_='chatlog__markdown-preserve')
+            if not msg:
+                continue
+
             text = msg.get_text(strip=True)
 
-            # Detect change from own message (True) to not own (False)
-            if prev_own_msg and not is_own_msg:
-                add_to_data = True  # Conversation flow changed, set flag
+            print(text)
 
             if not is_own_msg:
                 # Not own message → prompt
-                if not add_to_data:
+                if not add_to_data and prompt != "":
                     prompt += f"\n {text}"
                 else:
                     prompt = text
             else:
                 # Own message → response
-                response += f"\n {text}"
+                if text != "": 
+                    response += f"\n {text}"
 
-            # Save current state as previous for next iteration
+
+            # Detect change from own message (True) to not own (False)
+            # But prevent adding of empty strings
+            if prev_own_msg and not is_own_msg and response != "" and prompt != "":
+                add_to_data = True  # Conversation flow changed, set flag
+
+            # Save current state of this var as previous for next iteration
             prev_own_msg = is_own_msg
 
-            # Append current pair to training data only when add_to_data is True
+            # Append current pair to training data when we have text in both values
             if add_to_data:
                 full_training_data.append({'prompt': prompt, 'response': response})
-                # Optionally reset prompt/response and add_to_data here if starting a new conversation
+                add_to_data = False
                 prompt = ""
                 response = ""
-                add_to_data = False
 
     return full_training_data
         

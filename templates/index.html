@@ -17,6 +17,11 @@
         <textarea id="prompt" name="prompt" required></textarea><br />
         <button type="submit">Generate</button>
     </form>
+
+    {% if prompt %}
+    <h2>Prompt:</h2>
+    <pre>{{ prompt }}</pre>
+    {% endif %}
     
     {% if generated_text %}
     <h2>AI Response:</h2>

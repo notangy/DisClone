@@ -5,7 +5,9 @@ __pycache__/
 
 
 training.jsonl
+.python-version
 .DS_Store
+/Discord_Export
 
 # C extensions
 *.so

@@ -5,7 +5,7 @@ import torch
 
 app = Flask(__name__)
 
-checkpoint_path = os.path.abspath("./checkpoint-900")
+checkpoint_path = os.path.abspath("./checkpoint-8500") # change this to current model folder for testing
 
 # Load your fine-tuned model and tokenizer once when the app starts
 tokenizer = AutoTokenizer.from_pretrained(checkpoint_path, local_files_only=True)
@@ -29,7 +29,7 @@ def home():
         # Generate output (tweak parameters for creativity or length)
         outputs = model.generate(
             inputs, 
-            max_new_tokens=50,
+            max_new_tokens=60,
             do_sample=True, 
             top_p=0.95, 
             top_k=90,
@@ -37,13 +37,10 @@ def home():
             num_return_sequences=1,
             pad_token_id=tokenizer.pad_token_id,
         )
-        print(outputs)
         generated_sequence = tokenizer.decode(outputs[0])
-        print("Full generated sequence:", repr(generated_sequence))
         generated_text = generated_sequence.split("Response:")[-1].strip() 
-        print(generated_text)
         
-    return render_template("index.html", generated_text=generated_text)
+    return render_template("index.html", prompt=prompt, generated_text=generated_text)
 
 if __name__ == "__main__":
     app.run(port=8000, debug=True)
