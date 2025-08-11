@@ -10,10 +10,10 @@ import os
 # Value = response, AKA our own messages
 
 # This will contain our Discord logs
-root_folder = './Test'
+root_folder = './Discord_Export'
 
 # Name of the training file that will be produced
-output_file = 'training2.jsonl'
+output_file = 'training.jsonl'
 
 full_training_data = []
 
@@ -32,8 +32,6 @@ def search_through_logs(soup, discord_username):
     # But we want to ignore any messages that aren't from us
     # Solution: extract spans that are children of the span with title={DISCORD_USERNAME} 
 
-    i = 0
-
     for div in soup.find_all('div', class_='chatlog__message-group'):
 
 
@@ -42,8 +40,6 @@ def search_through_logs(soup, discord_username):
         is_own_msg = div.find('span', title=discord_username)
        
         for c in containers:
-
-            print(c)
 
            # Skip any container that contains an attachment or embed
             if c.find('div', class_='chatlog__attachment') or c.find('div', class_='chatlog__embed'):
@@ -55,8 +51,6 @@ def search_through_logs(soup, discord_username):
                 continue
 
             text = msg.get_text(strip=True)
-
-            print(text)
 
             if not is_own_msg:
                 # Not own message → prompt
