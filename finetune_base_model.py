@@ -1,3 +1,5 @@
+# First script to run: this will create a true base model from bulk training data
+
 import json
 from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 from datasets import Dataset

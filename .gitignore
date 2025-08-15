@@ -5,6 +5,7 @@ __pycache__/
 
 
 training.jsonl
+user_interactions.jsonl
 .python-version
 .DS_Store
 /Discord_Export
