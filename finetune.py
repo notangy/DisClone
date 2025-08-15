@@ -1,10 +1,12 @@
 import json
-from transformers import GPT2Tokenizer, GPT2LMHeadModel, Trainer, TrainingArguments, DataCollatorForLanguageModeling
+from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 from datasets import Dataset
 
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-tokenizer.pad_token = tokenizer.eos_token  # Use eos_token as pad_token
-model = GPT2LMHeadModel.from_pretrained('gpt2')
+MODEL_NAME="EleutherAI/gpt-neo-1.3B"
+
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+tokenizer.pad_token = tokenizer.eos_token
+model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
 
 def tokenize_function(examples):
   return tokenizer(examples['text'], truncation=True, padding='max_length', max_length=512, return_tensors=None)

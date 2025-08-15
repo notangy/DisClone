@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BOT_TOKEN = os.getenv('token') # put your bot token in a .env file
+BOT_TOKEN = os.getenv('discord_token') # put your bot token in a .env file
 
 
 checkpoint_path = os.path.abspath("./trained-model") 
@@ -40,7 +40,7 @@ class DisCloneClient(discord.Client):
             # Generate output (tweak parameters for creativity or length)
             outputs = model.generate(
                 inputs, 
-                max_new_tokens=30,
+                max_new_tokens=80,
                 do_sample=True, 
                 top_p=0.95, 
                 top_k=90,
@@ -55,6 +55,7 @@ class DisCloneClient(discord.Client):
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.dm_messages = True  # enable DM events
 
 client = DisCloneClient(intents=intents)
 client.run(BOT_TOKEN)
