@@ -1,20 +1,13 @@
-import discord
 import os
-import torch
 import json
 import random
-from dotenv import load_dotenv
-from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments
+
+from transformers import Trainer, TrainingArguments
 from datasets import Dataset
 from peft import LoraConfig, get_peft_model, PeftModel
 from apscheduler.schedulers.background import BackgroundScheduler
 
-
-load_dotenv()
-BOT_TOKEN = os.getenv("discord_token")
-MODEL_PATH = os.path.abspath(
-    "./trained-model"
-)  # Location of trained base model in directory
+from __main__ import tokenizer, base_model, device
 
 INTERACTIONS_FILE = (
     "user_interactions.jsonl"  # Location of discord user interaction logs
@@ -23,26 +16,15 @@ ADAPTER_DIR = "./lora-adapter"  # Location of LoRA training output
 
 MAX_INTERACTIONS = 5000  # Total dataset size after pruning
 RECENT_PERCENT = 0.8  # Fraction of dataset that will be recent
+
 OLD_PERCENT = (
     0.2  # Fraction that will be old random samples to prevent catastrophic forgetting
 )
 
 TRAINING_INTERVAL = 6  # How often to train the LoRA adaptation in hours
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# 1. Tokenizer & Base Model
-# ------------------------------
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-tokenizer.pad_token = tokenizer.eos_token
-base_model = AutoModelForCausalLM.from_pretrained(MODEL_PATH)
-base_model.to(device)
-
-model = base_model  # will be replaced with LoRA adapter when loaded
-
-model.eval()
-
-# 2. LoRA Config
+# 1. LoRA Config
 # ------------------------------
 peft_config = LoraConfig(
     r=8,
@@ -54,7 +36,7 @@ peft_config = LoraConfig(
 )
 
 
-# 3. Interaction Logging
+# 2. Interaction Logging
 # ------------------------------
 def log_interaction(prompt, response):
     with open(INTERACTIONS_FILE, "a", encoding="utf-8") as f:
@@ -62,9 +44,11 @@ def log_interaction(prompt, response):
         f.write("\n")
 
 
-# 4. Smart Pruning
+# 3. Smart Pruning
 # ------------------------------
 def prune_interactions():
+
+    # Stop interactions file getting too big
     if not os.path.exists(INTERACTIONS_FILE):
         return
 
@@ -83,10 +67,10 @@ def prune_interactions():
         random.shuffle(new_dataset)
         with open(INTERACTIONS_FILE, "w", encoding="utf-8") as f:
             f.writelines(new_dataset)
-        print(f"[Prune] Trimmed to {MAX_INTERACTIONS} entries.")
+        print(f"[Prune] Interaction log trimmed to {MAX_INTERACTIONS} entries.")
 
 
-# 5. LoRA Training
+# 4. LoRA Training
 # ------------------------------
 def train_lora():
     prune_interactions()
@@ -133,7 +117,7 @@ def train_lora():
     load_lora_adapter()
 
 
-# 6. Load LoRA Adapter
+# 5. Load LoRA Adapter
 # ------------------------------
 def load_lora_adapter(adapter_path=ADAPTER_DIR):
     global model
@@ -146,52 +130,11 @@ def load_lora_adapter(adapter_path=ADAPTER_DIR):
         print("[Model] LoRA adapter loaded.")
 
 
-# 7. Text Generation
-# ------------------------------
-def generate_response(prompt):
-    inputs = tokenizer(prompt, return_tensors="pt").to(device)
-    outputs = model.generate(
-        **inputs,
-        max_new_tokens=80,
-        do_sample=True,
-        top_p=0.95,
-        top_k=90,
-        temperature=0.8,
-        pad_token_id=tokenizer.pad_token_id,
-    )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-
-# 8. Discord Bot
-# ------------------------------
-class DisCloneClient(discord.Client):
-    async def on_ready(self):
-        print(f"Logged on as {self.user}!")
-
-    async def on_message(self, message):
-        if message.author == self.user:
-            return
-        if self.user.mentioned_in(message):
-            prompt_text = f"prompt: {message.content}\nresponse:"
-            bot_reply = generate_response(prompt_text).split("response:")[-1].strip()
-            log_interaction(message.content, bot_reply)
-            await message.channel.send(bot_reply)
-
-
-# 9. LoRA Scheduler
+# 6. LoRA Scheduler
 # ------------------------------
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(train_lora, "interval", hours=TRAINING_INTERVAL)
-scheduler.start()
 
-
-# 10. Main Bot Loop
-# ------------------------------
-if __name__ == "__main__":
-    load_lora_adapter()
-    intents = discord.Intents.default()
-    intents.message_content = True
-    intents.dm_messages = True
-    client = DisCloneClient(intents=intents)
-    client.run(BOT_TOKEN)
+def set_up_scheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(train_lora, "interval", hours=TRAINING_INTERVAL)
+    scheduler.start()

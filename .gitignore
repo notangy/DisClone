@@ -11,6 +11,7 @@ user_interactions.jsonl
 /Discord_Export
 /trained-model
 /checkpoint-*
+./lora-adapter
 
 # C extensions
 *.so
