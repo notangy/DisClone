@@ -35,14 +35,14 @@ Use the `finetune_base_model.py` script, which will read your training data and 
 
 **Note**: Depending on the size of your training data, the fitting process may take a long time with high resource usage. For reference, my data contained over 15000 key/value pairs and took an hour to train with an CUDA enabled RTX 4080. I only recommend using CPU with torch if your data set is very small (<1000)
 
-With your trained model ready, you can test it in the flask app `app.py`. It has a simple text box you can put prompts into to see what your model responds with.
+With your trained model ready, you can test it in the `./testing` folder with the flask app `app.py`. It has a simple text box you can put prompts into to see what your model responds with.
 
 # Creating the DisClone
 
 The last step will mostly be coming from https://discordpy.readthedocs.io/en/stable/ (assuming your bot code will be written in python).
 
 There's many different use cases for a Discord bot, but for now we'll just have ours respond with generated text whenever someone in a server directly mentions it.
-You'll need to have a bot set up already on the Discord developer portal, and a token for it. Place the token into a .env file as token={token_here}, and run `disclone.py` when your bot has been added to the Discord client.
+You'll need to have a bot set up already on the Discord developer portal, and a token for it. Place the token into a .env file as token={token_here}, and run `./bot/client.py` when your bot has been added to a server.
 
 # Optional feature: LoRA training
 

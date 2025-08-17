@@ -1,3 +1,4 @@
+import re
 import discord
 import os
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -68,7 +69,7 @@ class DisCloneClient(discord.Client):
             return
 
         # Remove ping from the message
-        message_cleaned = message.content.sub(r"<@!?\d+>", "", s)
+        message_cleaned = re.sub(r"<@!?\d+>", "", message.content)
 
         # Continue to gather our own messages for further training
         if message.author.id == DISCORD_ID and LORA_ENABLED:
