@@ -4,12 +4,6 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from dotenv import load_dotenv
 
-from bot.lora_training import (
-    log_interaction,
-    load_lora_adapter,
-    set_up_scheduler,
-)
-
 load_dotenv()
 
 BOT_TOKEN = os.getenv("discord_token")
@@ -29,6 +23,15 @@ base_model = AutoModelForCausalLM.from_pretrained(MODEL_PATH)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 base_model.to(device)
 
+
+# Import LoRA dependencies after model init
+from lora_training import (
+    log_interaction,
+    load_lora_adapter,
+    set_up_scheduler,
+)
+
+
 # 2. Response Generation
 # ------------------------------
 
@@ -45,7 +48,8 @@ def generate_response(prompt):
         temperature=0.8,
         pad_token_id=tokenizer.pad_token_id,
     )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+    generated_sequence = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return generated_sequence.split("response:")[-1].strip()
 
 
 # 3. Discord Bot
@@ -54,7 +58,7 @@ def generate_response(prompt):
 
 class DisCloneClient(discord.Client):
     async def on_ready(self):
-        print(f"Logged on as {self.user}!")
+        print(f"[Discord] Logged on as {self.user}!")
 
     async def on_message(self, message):
         if message.author == self.user:
@@ -77,6 +81,7 @@ class DisCloneClient(discord.Client):
 if __name__ == "__main__":
 
     if LORA_ENABLED:
+        print("[LoRA] LoRA enabled. Attempting to load adapter...")
         load_lora_adapter()
         set_up_scheduler()
 

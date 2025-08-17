@@ -75,14 +75,14 @@ def prune_interactions():
 def train_lora():
     prune_interactions()
     if not os.path.exists(INTERACTIONS_FILE):
-        print("No interactions logged yet.")
+        print("[LoRA] No interactions logged yet.")
         return
 
     with open(INTERACTIONS_FILE, "r", encoding="utf-8") as f:
         data = [json.loads(line) for line in f]
 
     if not data:
-        print("No training data available.")
+        print("[LoRA] No training data available.")
         return
 
     combined = [f"Prompt: {d['prompt']}\nResponse: {d['response']}" for d in data]
@@ -122,12 +122,12 @@ def train_lora():
 def load_lora_adapter(adapter_path=ADAPTER_DIR):
     global model
     if not os.path.exists(adapter_path):
-        print("No adapter found. Using base model only.")
+        print("[LoRA] No adapter found. Using base model only.")
         model = base_model
     else:
         model = PeftModel.from_pretrained(base_model, adapter_path)
         model.to(device)
-        print("[Model] LoRA adapter loaded.")
+        print("[LoRA] LoRA adapter loaded!")
 
 
 # 6. LoRA Scheduler
@@ -135,6 +135,8 @@ def load_lora_adapter(adapter_path=ADAPTER_DIR):
 
 
 def set_up_scheduler():
+    print(f"[LoRA] Attempting to load scheduler for interval {TRAINING_INTERVAL}")
     scheduler = BackgroundScheduler()
     scheduler.add_job(train_lora, "interval", hours=TRAINING_INTERVAL)
     scheduler.start()
+    print(f"[LoRA] Scheduler running!")
