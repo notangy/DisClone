@@ -9,8 +9,8 @@ load_dotenv()
 BOT_TOKEN = os.getenv("discord_token")
 MODEL_PATH = os.path.abspath("./trained-model")
 
-LORA_ENABLED = bool(os.getenv("use_lora", 0))  # false by default
-DISCORD_USERNAME = os.getenv("discord_username")  # for optional LoRA training
+LORA_ENABLED = bool(os.getenv("USE_LORA", 0))  # false by default
+DISCORD_ID = os.getenv("DISCORD_ID")  # for optional LoRA training
 
 
 # 1. Tokenizer & Base Model
@@ -61,8 +61,33 @@ class DisCloneClient(discord.Client):
         print(f"[Discord] Logged on as {self.user}!")
 
     async def on_message(self, message):
-        if message.author == self.user:
+        if message.author == self.user:  # prevent feedback loop
             return
+
+        # Continue to gather our own messages for further training
+        if message.author.id == DISCORD_ID and LORA_ENABLED:
+
+            # is this message a direct reply to someone?
+            if message.reference and message.reference.resolved:
+
+                replied_message = message.reference.resolved
+                log_interaction(replied_message.content, message.content)
+                return
+            else:
+                # if not a reply, fetch the last few messages before ours for prompt context
+                history = await message.channel.history(
+                    limit=2, before=message
+                ).flatten()
+
+                # reverse so older ones come first
+                history = list(reversed(history))
+
+                for msg in history:
+                    prompt += f"{msg.content} \n"
+
+                log_interaction(prompt, message.content)
+
+        # if bot has been pinged
         if self.user.mentioned_in(message):
             prompt_text = f"prompt: {message.content}\nresponse:"
 
